@@ -30,10 +30,10 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
-            filter: brightness(0.6); /* Darken video slightly for readability */
+            filter: brightness(0.6);
         }
 
-        /* MUTE BUTTON (Hidden initially) */
+        /* MUTE BUTTON */
         #mute-btn {
             position: fixed;
             top: 20px;
@@ -45,8 +45,8 @@
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s;
-            opacity: 0; /* Hidden until enter */
-            pointer-events: none; /* Not clickable until shown */
+            opacity: 0;
+            pointer-events: none;
             width: 40px;
             height: 40px;
             display: flex;
@@ -102,7 +102,7 @@
             margin-bottom: 20px;
         }
 
-        /* GLITCH USERNAME */
+        /* SHIMMER SHINE NAME EFFECT */
         .username-container {
             margin-bottom: 10px;
             display: flex;
@@ -111,39 +111,52 @@
             gap: 10px;
         }
 
-        .glitch {
-            position: relative;
+        .shimmer-name {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #fff;
             letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            
+            /* Text Color & Gradient Base */
+            color: rgba(255, 255, 255, 0.3); /* Dimmed base color */
+            background: linear-gradient(
+                to right, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,1) 50%, 
+                rgba(255,255,255,0) 100%
+            );
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            /* The Shine Animation */
+            animation: shine 4s linear infinite;
         }
 
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
+        /* Backup text for readability */
+        .shimmer-name::before {
+            content: "BrytNez";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            left: 0; top: 0;
+            z-index: -1;
+            color: rgba(255, 255, 255, 0.1); /* Subtle ghost background */
         }
 
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
+        @keyframes shine {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
         }
 
-        .glitch::after {
-            left: -2px;
-            text-shadow: -1px 0 #00fff9;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim-2 5s infinite linear alternate-reverse;
-        }
-
+        /* VERIFIED BADGE */
         .verified {
             color: #1da1f2;
             font-size: 1.2rem;
-            text-shadow: none;
+            cursor: help;
+            transition: transform 0.3s ease;
         }
+        .verified:hover { transform: scale(1.2); }
 
         /* BIO & SOCIALS */
         .bio {
@@ -156,6 +169,7 @@
         .socials {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 20px;
         }
         .social-btn {
@@ -163,38 +177,33 @@
             font-size: 1.8rem;
             text-decoration: none;
             transition: transform 0.3s, text-shadow 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
         }
+        
+        .social-btn svg {
+            fill: currentColor;
+            width: 28px;
+            height: 28px;
+            transition: filter 0.3s;
+        }
+
         .social-btn:hover {
             transform: translateY(-3px);
             text-shadow: 0 0 15px white;
         }
-        /* Specific brand colors on hover */
+
+        /* Brand Colors */
         .fa-youtube:hover { color: #FF0000; text-shadow: 0 0 15px #FF0000; }
         .fa-discord:hover { color: #5865F2; text-shadow: 0 0 15px #5865F2; }
-        .fa-gamepad:hover { color: #00ff00; text-shadow: 0 0 15px #00ff00; }
+        .roblox-link:hover { color: #888888; }
+        .roblox-link:hover svg { filter: drop-shadow(0 0 8px #888888); }
 
-        /* UTILITIES & ANIMATIONS */
+        /* UTILITIES */
         .hidden { display: none !important; }
         .show-element { opacity: 1 !important; pointer-events: auto !important; transform: scale(1); }
 
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(31px, 9999px, 94px, 0); transform: dummy skew(0.85deg); }
-            20% { clip: rect(61px, 9999px, 3px, 0); transform: skew(0.53deg); }
-            40% { clip: rect(53px, 9999px, 83px, 0); transform: skew(0.24deg); }
-            60% { clip: rect(22px, 9999px, 4px, 0); transform: skew(0.68deg); }
-            80% { clip: rect(78px, 9999px, 53px, 0); transform: skew(0.68deg); }
-            100% { clip: rect(86px, 9999px, 12px, 0); transform: skew(0.81deg); }
-        }
-        @keyframes glitch-anim-2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.38deg); }
-            20% { clip: rect(5px, 9999px, 63px, 0); transform: skew(0.94deg); }
-            40% { clip: rect(98px, 9999px, 5px, 0); transform: skew(0.07deg); }
-            60% { clip: rect(47px, 9999px, 34px, 0); transform: skew(0.24deg); }
-            80% { clip: rect(31px, 9999px, 24px, 0); transform: skew(0.53deg); }
-            100% { clip: rect(9px, 9999px, 12px, 0); transform: skew(0.3deg); }
-        }
     </style>
 </head>
 <body>
@@ -219,8 +228,8 @@
         <img src="pfp.png" alt="BrytNez" class="pfp">
         
         <div class="username-container">
-            <div class="glitch" data-text="BrytNez">BrytNez</div>
-            <i class="fas fa-check-circle verified" title="Verified"></i>
+            <div class="shimmer-name">BrytNez</div>
+            <i class="fas fa-check-circle verified" title="Owner"></i>
         </div>
 
         <div class="bio" id="typewriter"></div>
@@ -234,17 +243,17 @@
                 <i class="fab fa-discord"></i>
             </a>
             
-            <a href="https://www.roblox.com/users/3203622463/profile" target="_blank" class="social-btn">
-                <i class="fas fa-gamepad"></i>
+            <a href="https://www.roblox.com/users/3203622463/profile" target="_blank" class="social-btn roblox-link">
+                <svg viewBox="0 0 24 24">
+                    <path d="m13.383 14.341-3.726-.958.959-3.726 3.726.959-.96 3.726zM4.913 0 0 19.088 19.088 24 24 4.912 4.912 0z"/>
+                </svg>
             </a>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const bioText = "CC | Roblox/Web Developer"; 
         const typingSpeed = 100;
-        // ---------------------
 
         const enterScreen = document.getElementById('enter-screen');
         const mainCard = document.getElementById('main-card');
@@ -253,23 +262,19 @@
         const muteIcon = document.getElementById('mute-icon');
         const typewriterElement = document.getElementById('typewriter');
 
-        // ENTER SCREEN LOGIC
         enterScreen.addEventListener('click', () => {
             enterScreen.style.opacity = '0';
-            
-            // Play Music
             audio.volume = 0.5; 
             audio.play().catch(e => console.log("Audio blocked", e));
 
             setTimeout(() => {
                 enterScreen.classList.add('hidden');
                 mainCard.classList.add('show-element');
-                muteBtn.classList.add('show-element'); // Show mute button
+                muteBtn.classList.add('show-element');
                 startTypewriter();
             }, 1000);
         });
 
-        // MUTE BUTTON LOGIC
         muteBtn.addEventListener('click', () => {
             if (audio.muted) {
                 audio.muted = false;
@@ -282,7 +287,6 @@
             }
         });
 
-        // TYPEWRITER EFFECT
         let i = 0;
         function startTypewriter() {
             if (i < bioText.length) {
