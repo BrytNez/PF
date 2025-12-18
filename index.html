@@ -19,6 +19,18 @@
             align-items: center;
             justify-content: center;
             color: white;
+            cursor: none; /* Hide default cursor to use the trail effect */
+        }
+
+        /* CURSOR CANVAS */
+        #cursor-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
         }
 
         /* VIDEO BACKGROUND */
@@ -43,7 +55,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 10px;
             border-radius: 50%;
-            cursor: pointer;
+            cursor: none; 
             transition: all 0.3s;
             opacity: 0;
             pointer-events: none;
@@ -67,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: none;
             transition: opacity 1s ease;
         }
         #enter-screen p {
@@ -102,7 +114,7 @@
             margin-bottom: 20px;
         }
 
-        /* SHIMMER SHINE NAME EFFECT */
+        /* NAME STYLING */
         .username-container {
             margin-bottom: 10px;
             display: flex;
@@ -111,15 +123,18 @@
             gap: 10px;
         }
 
-        .shimmer-name {
+        .name-style {
             font-size: 2.5rem;
             font-weight: bold;
             letter-spacing: 2px;
-            position: relative;
+            color: #fff;
+            min-width: 200px;
             display: inline-block;
-            
-            /* Text Color & Gradient Base */
-            color: rgba(255, 255, 255, 0.3); /* Dimmed base color */
+        }
+
+        /* SHIMMER SHINE (Starts after scramble) */
+        .apply-shimmer {
+            color: rgba(255, 255, 255, 0.2); 
             background: linear-gradient(
                 to right, 
                 rgba(255,255,255,0) 0%, 
@@ -130,21 +145,10 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            
-            /* The Shine Animation */
-            animation: shine 4s linear infinite;
+            animation: slow-shine 10s linear infinite;
         }
 
-        /* Backup text for readability */
-        .shimmer-name::before {
-            content: "BrytNez";
-            position: absolute;
-            left: 0; top: 0;
-            z-index: -1;
-            color: rgba(255, 255, 255, 0.1); /* Subtle ghost background */
-        }
-
-        @keyframes shine {
+        @keyframes slow-shine {
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
         }
@@ -153,7 +157,6 @@
         .verified {
             color: #1da1f2;
             font-size: 1.2rem;
-            cursor: help;
             transition: transform 0.3s ease;
         }
         .verified:hover { transform: scale(1.2); }
@@ -208,6 +211,8 @@
 </head>
 <body>
 
+    <canvas id="cursor-canvas"></canvas>
+
     <video id="bg-video" autoplay muted loop playsinline>
         <source src="background.mp4" type="video/mp4">
     </video>
@@ -228,7 +233,7 @@
         <img src="pfp.png" alt="BrytNez" class="pfp">
         
         <div class="username-container">
-            <div class="shimmer-name">BrytNez</div>
+            <div class="name-style" id="name-target"></div>
             <i class="fas fa-check-circle verified" title="Owner"></i>
         </div>
 
@@ -238,11 +243,9 @@
             <a href="https://www.youtube.com/@smallnutswastaken" target="_blank" class="social-btn">
                 <i class="fab fa-youtube"></i>
             </a>
-
             <a href="https://discord.gg/9VqvYHnEyT" target="_blank" class="social-btn">
                 <i class="fab fa-discord"></i>
             </a>
-            
             <a href="https://www.roblox.com/users/3203622463/profile" target="_blank" class="social-btn roblox-link">
                 <svg viewBox="0 0 24 24">
                     <path d="m13.383 14.341-3.726-.958.959-3.726 3.726.959-.96 3.726zM4.913 0 0 19.088 19.088 24 24 4.912 4.912 0z"/>
@@ -254,6 +257,8 @@
     <script>
         const bioText = "CC | Roblox/Web Developer"; 
         const typingSpeed = 100;
+        const nameToScramble = "BrytNez";
+        const chars = "!<>-_\\/[]{}—=+*^?#________";
 
         const enterScreen = document.getElementById('enter-screen');
         const mainCard = document.getElementById('main-card');
@@ -261,6 +266,84 @@
         const muteBtn = document.getElementById('mute-btn');
         const muteIcon = document.getElementById('mute-icon');
         const typewriterElement = document.getElementById('typewriter');
+        const nameElement = document.getElementById('name-target');
+
+        /* --- CURSOR TRAIL LOGIC --- */
+        const canvas = document.getElementById('cursor-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+                this.color = 'rgba(255, 255, 255, 0.8)';
+                this.life = 1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02; 
+                if (this.size > 0.1) this.size -= 0.05;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            for (let i = 0; i < 3; i++) { 
+                particles.push(new Particle(e.x, e.y));
+            }
+        });
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* --- PROFILE LOGIC --- */
+        function runNameEffects(element, finalValue) {
+            let iteration = 0;
+            const interval = setInterval(() => {
+                element.innerText = finalValue.split("")
+                    .map((letter, index) => {
+                        if(index < iteration) return finalValue[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join("");
+                
+                if(iteration >= finalValue.length) {
+                    clearInterval(interval);
+                    // Shimmer starts immediately after scramble finishes
+                    element.classList.add('apply-shimmer');
+                }
+                iteration += 1 / 3; 
+            }, 30); 
+        }
 
         enterScreen.addEventListener('click', () => {
             enterScreen.style.opacity = '0';
@@ -271,7 +354,10 @@
                 enterScreen.classList.add('hidden');
                 mainCard.classList.add('show-element');
                 muteBtn.classList.add('show-element');
-                startTypewriter();
+                
+                runNameEffects(nameElement, nameToScramble);
+                
+                setTimeout(startTypewriter, 1000);
             }, 1000);
         });
 
